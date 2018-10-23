@@ -12,10 +12,10 @@ const config = {
   },
   production: {
     db: {
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      host: process.env.DB_HOST,
+      database: ddb60qah8cpn5n,
+      user: wyofmmwppviiga,
+      password: 615c5ecb4e93d029261948ca99c6d166f165bfa548bd39ad0e0751aaf79df8e6,
+      host: ec2-54-221-225-11.compute-1.amazonaws.com,
       port: 5432,
       ssl: true
     },
@@ -25,4 +25,4 @@ const config = {
   }
 };
 
-module.exports = process.env.NODE_ENV === 'development' ? config.production : config.development;
+module.exports = process.env.NODE_ENV === 'production' ? config.production : config.development;
