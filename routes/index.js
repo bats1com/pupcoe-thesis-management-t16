@@ -4,7 +4,16 @@ var router = express.Router();
 /* GET home page. */
 router.get('/', function(req, res, next) {
   if (req.isAuthenticated()) {
-    res.render('index', { title: 'Express' });
+    if (req.user.is_admin) {
+      res.render('admin/home', { layout: 'admin' });
+    } else if (req.user.user_type == 'faculty') {
+      res.render('faculty/home', { layout: 'faculty' });
+    } else {
+      Class.getByStudentId(req.user.id).then(function(data) {
+        console.log('data student', data);
+        res.render('student/home', { layout: 'student', user: data });
+      });
+    }
   } else {
     res.redirect('/login')
   }
