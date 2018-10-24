@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+const User = require('./../models/user');
+const Class = require('./../models/class');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
