@@ -13,16 +13,26 @@ router.get('/', function(req, res, next) {
           .then((group_members) => {
             console.log('data student', data);
             console.log('data group', group_members);
-            res.render('student/home', { 
-              layout: 'student', 
-              first_name: req.user.first_name, 
-              last_name: req.user.last_name, 
-              user: data, 
-              group_members: group_members, 
-              groupId: group_members[0].group_id, 
-              groupName: group_members[0].name});
+            if (group_members != '') {
+              res.render('student/home', { 
+                layout: 'student', 
+                first_name: req.user.first_name, 
+                last_name: req.user.last_name, 
+                user: data, 
+                group_members: group_members, 
+                groupId: group_members[0].group_id, 
+                groupName: group_members[0].name
+              });
+            } else {
+              res.render('student/home', { 
+                layout: 'student', 
+                first_name: req.user.first_name, 
+                last_name: req.user.last_name, 
+                user: data,
+              });
+            }
         })
-    })
+      })
   } else {
     res.redirect('/')
   }
