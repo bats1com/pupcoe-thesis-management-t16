@@ -1,0 +1,30 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Groups</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group mr-2">
+      <a href="/faculty/group-create" class="btn btn-sm btn-outline-secondary">Add Group</a>
+    </div>
+  </div>
+</div>
+<div>
+  <table class="table table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Group #</th>
+      <th scope="col">Name</th>
+      <th scope="col">Section</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each groups}}
+    <tr>
+      <th scope="row">{{this.id}}</th>
+      <td>{{this.name}}</td>
+      <td>{{this.section}}</td>
+      <td><a href='/faculty/group/{{this.id}}'>view</a></td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+</div>

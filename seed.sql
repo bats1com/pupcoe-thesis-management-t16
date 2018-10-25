@@ -12,17 +12,16 @@ CREATE TABLE "users" (
   "is_admin" boolean default 'f' NOT NULL
 );
 
-INSERT INTO users(first_name, last_name, email, password, phone, user_type, is_admin)
-  VALUES (
-    'Jomar',
-    'Vista',
-    'jdvista96@gmail.com',
-    '123',
-    '09123456789',
-    'faculty',
-    't'
-  );
-
+-- INSERT INTO users(first_name, last_name, email, password, phone, user_type, is_admin)
+--   VALUES (
+--     'Jomar',
+--     'Vista',
+--     'jdvista96@gmail.com',
+--     '123',
+--     '09123456789',
+--     'faculty',
+--     't'
+--   );
 
 CREATE TABLE "classes" (
   "id" SERIAL PRIMARY KEY,
@@ -34,5 +33,18 @@ CREATE TABLE "classes" (
 CREATE TABLE "classStudents" (
   "id" SERIAL PRIMARY KEY,
   "class_id" INT REFERENCES classes(id),
+  "student_id" INT REFERENCES users(id)
+);
+
+CREATE TABLE "groups" (
+  "id" SERIAL PRIMARY KEY,
+  "name" VARCHAR(80) NOT NULL,
+  "section" VARCHAR(2) NOT NULL,
+  "adviser" INT REFERENCES users(id)
+);
+
+CREATE TABLE "group_members" (
+  "id" SERIAL PRIMARY KEY,
+  "group_id" INT REFERENCES groups(id),
   "student_id" INT REFERENCES users(id)
 );

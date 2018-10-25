@@ -65,6 +65,23 @@ var User = {
       });
     });
     return promise;
+  },
+  noGroupList: () => {
+    const query = `
+      SELECT *
+      FROM users
+      WHERE user_type = 'student' AND id NOT IN (SELECT DISTINCT student_id FROM group_members)
+    `;
+    var promise = new Promise((resolve, reject) => {
+      db.query(query, (req, data) => {
+        if (data && data.rowCount) {
+          resolve(data.rows);
+        } else {
+          resolve([]);
+        }
+      });
+    });
+    return promise;
   },  
   create: (userData, type) => {
     // check first if user with given email already exists

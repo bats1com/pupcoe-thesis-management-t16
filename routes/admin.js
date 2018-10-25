@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const User = require('./../models/user');
 const Class = require('./../models/class');
+const Group = require('./../models/group');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -21,7 +22,7 @@ router.get('/faculties', function(req, res, next) {
   } else {
     res.redirect('/')
   }
-});
+}); 
 
 router.get('/faculty-create', function(req, res, next) {
   if (req.isAuthenticated() && req.user.is_admin) {
