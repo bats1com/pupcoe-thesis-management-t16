@@ -3,6 +3,7 @@ var router = express.Router();
 const User = require('./../models/user');
 const Class = require('./../models/class');
 const Group = require('./../models/group');
+const Committee = require('./../models/committee');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -17,6 +18,7 @@ router.get('/faculties', function(req, res, next) {
   if (req.isAuthenticated() && req.user.is_admin) {
     User.list('faculty')
         .then(function(users) {
+          console.log('users', users)
           res.render('admin/faculties', { layout: 'admin', users: users });
         })
   } else {
@@ -123,6 +125,37 @@ router.post('/class-create', function(req, res, next) {
   } else {
     res.redirect('/')
   }
-})
+}),
+
+router.get('/committee', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    User.listCommittee('committee')
+      .then((committee_members) => {
+        User.notCommitteeList('faculty')
+         .then((allFaculty) => {
+        console.log('commmiteeData', committee_members)
+            res.render('admin/committee', {
+              layout: 'admin',
+              allFaculty: allFaculty,
+              committee_members:committee_members
+            });
+          })
+      })
+  } else {
+    res.redirect('/')
+  }
+}); 
+
+router.post('/committee/remove-member/:facultyId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('params', req.params);
+    console.log('facultyId', req.params.facultyId);
+    Committee.deleteMember(req.params.facultyId).then(() => {
+      res.redirect('/admin/committee');
+    });
+  } else {
+    res.redirect('/')
+  }
+});
 
 module.exports = router;

@@ -48,3 +48,10 @@ CREATE TABLE "group_members" (
   "group_id" INT REFERENCES groups(id),
   "student_id" INT REFERENCES users(id)
 );
+
+-- add committee table
+
+CREATE TABLE "committee_members" (
+  "id" SERIAL PRIMARY KEY,
+  "faculty_id" INT REFERENCES users(id)
+);
