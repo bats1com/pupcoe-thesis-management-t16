@@ -202,7 +202,7 @@ router.post('/thesis/committee-approval/approve', function(req, res, next) {
           .then(function(memberCount) {
             console.log('memberCount', memberCount);
             var memCount = memberCount[0].member_approval;
-            if (memCount > 2) {                          // 2 + 1= number of needed members approved
+            if (memCount > 4) {                          // 5 members approval needed for committee approval
               Thesis.committeeApprovedComplete(req.body.thesisId)
             }
             console.log('committee approved:', committee_approval);

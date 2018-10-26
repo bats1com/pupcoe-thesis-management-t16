@@ -135,37 +135,21 @@ var Thesis = {
 //  continue meeeee------------------------
   listForCommitteeApproval: (userId) => {
     const query = `
-      SELECT DISTINCT ON (t.id)
-      t.id,
-      t.title,
-      t.adviser_approved,
-      m.committee_id
+      SELECT
+        t.id,
+        t.title,
+        t.adviser_approved
       FROM thesis t
-      FULL OUTER JOIN members_done m ON t.id = m.thesis_id
       WHERE t.adviser_approved = true
-      AND t.committee_approved = false
-      AND (
-        m.committee_id IS NULL
-        OR 
-        ${userId} != committee_id
+      AND t.id NOT IN (
+        SELECT 
+          t.id
+        FROM thesis t 
+        FULL OUTER JOIN members_done m ON t.id = m.thesis_id 
+        WHERE t.adviser_approved = true
+        AND m.committee_id = ${userId}
       )
     `;
-      // AND thesis_id NOT IN (SELECT thesis_id FROM members_done WHERE committee_id = ${userId})
-      // SELECT DISTINCT ON (t.id)
-      // t.id,
-      // t.title,
-      // t.adviser_approved,
-      // m.committee_id
-      // FROM thesis t
-      // FULL OUTER JOIN members_done m ON t.id = m.thesis_id
-      // WHERE t.adviser_approved = true
-      // AND thesis_id NOT IN (SELECT thesis_id FROM members_done WHERE committee_id = ${userId})
-      // AND t.committee_approved = false
-      // AND (
-      //   m.committee_id IS NULL
-      //   OR 
-      //   ${userId} != committee_id 
-      // )
     var promise = new Promise((resolve, reject) => {
       console.log('query', query)
       db.query(query, (req, data) => {
