@@ -34,6 +34,10 @@ var Thesis = {
       SELECT *
       FROM thesis
       WHERE group_id=${groupId}
+      ORDER BY adviser_approved DESC,
+      adviser_rejected ASC,
+      committee_approved DESC,
+      id ASC
     `;
     var promise = new Promise((resolve, reject) => {
       console.log('query', query)
@@ -51,8 +55,11 @@ var Thesis = {
 
   list: () => {
     const query = `
-      SELECT *
-      FROM thesis
+      SELECT * FROM thesis
+      ORDER BY adviser_approved DESC,
+      adviser_rejected ASC,
+      committee_approved DESC,
+      id ASC
     `;
     var promise = new Promise((resolve, reject) => {
       console.log('query', query)
