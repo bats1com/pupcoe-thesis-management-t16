@@ -41,18 +41,31 @@ router.get('/', function(req, res, next) {
 
 router.get('/thesis', function(req, res, next) {
   if (req.isAuthenticated() && req.user.user_type == 'student') {
+    var alreadyChosen = false;
     Class.getByStudentId(req.user.id)
       .then(function(data) {
         // create function for viewing all thesis
         Thesis.listByGroupId(data.group_id)
           .then(function(thesis) {
-            console.log('thesis data', thesis);
-            console.log('student data', data);
-            res.render('student/thesis', {
-              layout: 'student',
-              data: data,
-              thesis: thesis
-            });
+            Group.checkThesisIdIfNull(data.group_id)
+              .then(function (thesisId) {
+                console.log('thesisId', thesisId);
+                if (thesisId != null) {
+                  alreadyChosen = true;
+                  console.log('alreadyChosen', alreadyChosen);
+                }
+                thesis.forEach(function(t) {
+                  t.alreadyChosen = alreadyChosen;
+                })
+                console.log('thesis data', thesis);
+                console.log('student data', data);
+                res.render('student/thesis', {
+                  layout: 'student',
+                  data: data,
+                  thesis: thesis,
+                  alreadyChosen: alreadyChosen
+                });
+              });
           });
       });
   } else {
@@ -81,6 +94,21 @@ router.post('/thesis/thesis-create', function(req, res, next) {
     Thesis.create(req.body).then((createdThesis) => {
       res.redirect('/student/thesis');
     });
+  }
+});
+
+router.post('/thesis/choose-proposal', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'student') {
+    console.log('thesisID: ', req.body.thesisId)
+    // create function to put thesisId on groups table and change thesis status from none to mor
+    Class.getByStudentId(req.user.id)
+      .then(function(data) {
+        Group.insertThesisId(req.body.thesisId, data.group_id)
+          .then(function(data2) {
+            console.log('insertedthesisId', data2);
+            res.redirect('/student/thesis');
+          });
+      });
   }
 });
 

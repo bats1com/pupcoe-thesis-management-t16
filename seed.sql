@@ -40,7 +40,8 @@ CREATE TABLE "groups" (
   "id" SERIAL PRIMARY KEY,
   "name" VARCHAR(80) NOT NULL,
   "section" VARCHAR(2) NOT NULL,
-  "adviser" INT REFERENCES users(id)
+  "adviser" INT REFERENCES users(id),
+  "thesis_id" INT REFERENCES thesis(id)
 );
 
 CREATE TABLE "group_members" (
@@ -58,6 +59,8 @@ CREATE TABLE "committee_members" (
 
 -- add thesis table
 
+CREATE TYPE current_stage AS ENUM ('none', 'mor', 'dp1', 'dp2');
+
 CREATE TABLE "thesis" (
   "id" SERIAL PRIMARY KEY,
   "title" VARCHAR(200) NOT NULL,
@@ -68,7 +71,7 @@ CREATE TABLE "thesis" (
   "adviser_approved" boolean default 'f' NOT NULL,
   "adviser_rejected" boolean default 'f' NOT NULL,
   "committee_approved" boolean default 'f' NOT NULL,
-  "for_defense" boolean default 'f' NOT NULL,
+  "current_stage" current_stage default 'none' NOT NULL,
   "final_verdict" boolean default 'f' NOT NULL
 );
 
@@ -94,4 +97,8 @@ CREATE TABLE "members_done" (
 --   "defense_type" defense_type default 'MOR' NOT NULL
 --   "status"
 -- );
+-- ALTER TABLE thesis DROP COLUMN for_defense;
+-- CREATE TYPE current_stage AS ENUM ('none', 'mor', 'dp1', 'dp2');
+-- ALTER TABLE thesis ADD COLUMN current_stage current_stage default 'none' NOT NULL;
+-- ALTER TABLE groups ADD COLUMN thesis_id INT REFERENCES thesis(id);
 

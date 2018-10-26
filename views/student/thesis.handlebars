@@ -28,7 +28,18 @@
       <td>{{this.group_id}}</td>
       {{!-- {{#if this.is_admin}}✓{{else}} {{/if}} --}}
       <td>{{#if this.adviser_approved}}✓ {{else}}{{#if this.adviser_rejected}}X {{else}}Pending {{/if}}{{/if}}</td>
-      <td>{{#if this.committee_approved}}✓{{else}}X{{/if}}</td>
+      <td>
+      {{#if this.committee_approved}}✓ 
+
+      {{#if alreadyChosen}} Already picked proposal for defense 
+      {{else}} 
+        <form action="/student/thesis/choose-proposal" method="POST">
+          <button value="{{this.id}}" name="thesisId" type="submit">Choose Proposal</button>
+        </form>
+      {{/if}}
+
+      {{else}}X{{/if}}
+      </td>
     </tr>
     {{/each}}
   </tbody>

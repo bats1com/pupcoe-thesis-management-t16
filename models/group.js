@@ -151,7 +151,48 @@ var Group = {
       });
     });
     return promise;
+  },
+
+  // create function to insert thesisID to group
+  insertThesisId: (thesisId, groupId) => {
+    const promise = new Promise((resolve, reject) => {
+      var createQuery = `
+        UPDATE groups
+        SET thesis_id = ${thesisId}
+        WHERE id = ${groupId}
+        RETURNING *
+      `;
+      db.query(createQuery, (req, data) => {
+        console.log('req', req);
+        console.log('created', data);
+        resolve(data.rows[0]);
+      });
+    });
+    return promise;
+  },
+
+  checkThesisIdIfNull: (groupId) => {
+    const query = `
+      SELECT 
+        g.thesis_id
+      FROM groups g
+      WHERE g.id = ${groupId}
+    `;
+    var promise = new Promise((resolve, reject) => {
+      db.query(query, (req, data) => {
+        console.log('req', req)
+        console.log('data', data)
+        if (data && data.rowCount) {
+          resolve(data.rows);
+        } else {
+          resolve([]);
+        }
+      });
+    });
+    return promise;
   }
+
+
 };
 
 module.exports = Group;
