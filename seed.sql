@@ -55,3 +55,43 @@ CREATE TABLE "committee_members" (
   "id" SERIAL PRIMARY KEY,
   "faculty_id" INT REFERENCES users(id)
 );
+
+-- add thesis table
+
+CREATE TABLE "thesis" (
+  "id" SERIAL PRIMARY KEY,
+  "title" VARCHAR(200) NOT NULL,
+  "abstract" VARCHAR(1000) NOT NULL,
+  "group_id" INT REFERENCES groups(id),
+  "year" VARCHAR(4) NOT NULL,
+  "adviser_id" INT REFERENCES users(id),
+  "adviser_approved" boolean default 'f' NOT NULL,
+  "adviser_rejected" boolean default 'f' NOT NULL,
+  "committee_approved" boolean default 'f' NOT NULL,
+  "for_defense" boolean default 'f' NOT NULL,
+  "final_verdict" boolean default 'f' NOT NULL
+);
+
+CREATE TABLE "committee_approval" (
+  "id" SERIAL PRIMARY KEY,
+  "thesis_id" INT REFERENCES thesis(id),
+  "member_approval" INT default 0 NOT NULL
+);
+
+CREATE TABLE "members_done" (
+  "id" SERIAL PRIMARY KEY,
+  "thesis_id" INT REFERENCES thesis(id),
+  "committee_id" INT REFERENCES users(id)
+);
+
+-- DROP TABLE committee_approval CASCADE;
+-- DROP TABLE members_done CASCADE;
+-- CREATE TYPE defense_type AS ENUM ('MOR', 'DP1', 'DP2');
+-- CREATE TYPE status AS ENUM ('failed, passed')
+-- CREATE TABLE "defense" (
+--   "id" SERIAL PRIMARY KEY
+--   "thesis_id" INT REFERENCES thesis(id),
+--   "defense_type" defense_type default 'MOR' NOT NULL
+--   "status"
+-- );
+

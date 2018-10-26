@@ -23,6 +23,27 @@ var Committee = {
     return promise;
   },
 
+  checkIfCommittee: (facultyId) => {
+   const query = `
+      SELECT *
+      FROM committee_members
+      WHERE faculty_id = ${facultyId}
+    `;
+    var promise = new Promise((resolve, reject) => {
+      console.log('query', query)
+      db.query(query, (req, data) => {
+        console.log('req', req);
+        console.log('data', data);
+        if (data && data.rowCount) {
+          resolve(data.rows);
+        } else {
+          resolve(false);
+        }
+      });
+    });
+    return promise;
+  },
+
   deleteMember: (facultyId) => {
     // check first if user with given email already exists
     const promise = new Promise((resolve, reject) => {

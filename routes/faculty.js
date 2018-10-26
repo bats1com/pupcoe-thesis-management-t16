@@ -3,6 +3,8 @@ var router = express.Router();
 const User = require('./../models/user');
 const Class = require('./../models/class');
 const Group = require('./../models/group');
+const Committee = require('./../models/committee');
+const Thesis = require('./../models/thesis');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -100,5 +102,131 @@ router.post('/group/:groupId/remove-student/:studentId', function(req, res, next
   }
 });
 
+router.get('/thesis', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'faculty') {
+        // create function for viewing all thesis
+    var is_Committee = false;
+    Committee.checkIfCommittee(req.user.id)
+      .then(function(isCommittee) {
+        console.log('isCOM',isCommittee)
+        if (isCommittee) {
+          is_Committee = true;
+        }
+        console.log('iscom', is_Committee)
+      Thesis.list()
+        .then(function(thesis) {
+          console.log('thesis data', thesis);
+          res.render('faculty/thesis', {
+            layout: 'faculty',
+            thesis: thesis,
+            is_Committee: is_Committee
+          });
+        });
+
+      });
+
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/thesis/adviser-approval', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'faculty') {
+        // create function for viewing all thesis
+    Thesis.listByAdviserId(req.user.id)
+      .then(function(adviser_approval) {
+        console.log('thesis data', adviser_approval);
+        res.render('faculty/adviser_approval', {
+          layout: 'faculty',
+          adviser_approval: adviser_approval
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+// POST rote for approve and reject
+
+router.post('/thesis/adviser-approval/approve', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'faculty') {
+        // create function for viewing all thesis
+    console.log('id', req.body)
+    Thesis.adviserApproved(req.body.thesisId)
+      .then(function(adviser_approval) {
+        console.log('adviser approved:', adviser_approval);
+        res.redirect('/faculty/thesis/adviser-approval')
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/thesis/adviser-approval/reject', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'faculty') {
+        // create function for viewing all thesis
+    console.log('id', req.body)
+    Thesis.adviserRejected(req.body.thesisId)
+      .then(function(adviser_approval) {
+        console.log('adviser approved:', adviser_approval);
+        res.redirect('/faculty/thesis/adviser-approval')
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/thesis/committee-approval', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'faculty') {
+    // create function for showing only theses that has not been judged yet by the specific faculty
+    Thesis.listForCommitteeApproval(req.user.id)
+      .then(function(committee_approval) {
+        console.log('thesis data', committee_approval);
+        res.render('faculty/committee_approval', {
+          layout: 'faculty',
+          committee_approval: committee_approval
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/thesis/committee-approval/approve', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'faculty') {
+    // create function for viewing all thesis
+    console.log('id', req.body)
+    Thesis.committeeApproved(req.body.thesisId, req.user.id)
+      .then(function(committee_approval) {
+    // Create function to check if approval count reached more than 70%
+        Thesis.checkCommitteeApprovalCount(req.body.thesisId)
+          .then(function(memberCount) {
+            console.log('memberCount', memberCount);
+            var memCount = memberCount[0].member_approval;
+            if (memCount > 2) {                          // 2 + 1= number of needed members approved
+              Thesis.committeeApprovedComplete(req.body.thesisId)
+            }
+            console.log('committee approved:', committee_approval);
+            res.redirect('/faculty/thesis/committee-approval')
+          })
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/thesis/committee-approval/reject', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'faculty') {
+        // create function for viewing all thesis
+    console.log('id', req.body)
+    Thesis.committeeReject(req.body.thesisId, req.user.id)
+      .then(function(committee_approval) {
+        console.log('committee approved:', committee_approval);
+        // Insert function that will check if committee count for approval is reached
+        res.redirect('/faculty/thesis/committee-approval')
+      });
+  } else {
+    res.redirect('/')
+  }
+});
 
 module.exports = router;

@@ -35,11 +35,14 @@ var Class = {
         u.email,
         us.first_name as adviser_fname,
         us.last_name as adviser_lname,
-        us.email as adviser_email
+        us.email as adviser_email,
+        us.id as adviser_id,
+        g.group_id
       FROM "classStudents" c
       INNER JOIN classes cl on c.class_id = cl.id
       INNER JOIN users u on c.student_id = u.id
       INNER JOIN users us on cl.adviser = us.id
+      INNER JOIN group_members g on u.id = g.student_id
       WHERE c.student_id = ${studentId}
     `;
     var promise = new Promise((resolve, reject) => {

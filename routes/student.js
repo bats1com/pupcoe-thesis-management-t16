@@ -3,6 +3,7 @@ var router = express.Router();
 const User = require('./../models/user');
 const Class = require('./../models/class');
 const Group = require('./../models/group');
+const Thesis = require('./../models/thesis');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -38,5 +39,49 @@ router.get('/', function(req, res, next) {
   }
 });
 
+router.get('/thesis', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'student') {
+    Class.getByStudentId(req.user.id)
+      .then(function(data) {
+        // create function for viewing all thesis
+        Thesis.listByGroupId(data.group_id)
+          .then(function(thesis) {
+            console.log('thesis data', thesis);
+            console.log('student data', data);
+            res.render('student/thesis', {
+              layout: 'student',
+              data: data,
+              thesis: thesis
+            });
+          });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/thesis/thesis-create', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'student') {
+    Class.getByStudentId(req.user.id)
+      .then(function(data) {
+        console.log('student data', data);
+        res.render('student/thesis_create', {
+          layout: 'student',
+          data: data
+        }); 
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/thesis/thesis-create', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'student') {
+    console.log('thesis data', req.body)
+    Thesis.create(req.body).then((createdThesis) => {
+      res.redirect('/student/thesis');
+    });
+  }
+});
 
 module.exports = router;

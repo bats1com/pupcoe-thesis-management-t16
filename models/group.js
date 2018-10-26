@@ -1,4 +1,3 @@
-// pattern class.js
 const db = require('./../db');
 
 var Group = {
