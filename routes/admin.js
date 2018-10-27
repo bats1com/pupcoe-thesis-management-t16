@@ -175,7 +175,7 @@ router.get('/thesis', function(req, res, next) {
       Thesis.list()
         .then(function(thesis) {
           console.log('thesis data', thesis);
-          res.render('faculty/thesis', {
+          res.render('admin/thesis', {
             layout: 'admin',
             thesis: thesis,
             is_Committee: is_Committee
@@ -195,7 +195,7 @@ router.get('/thesis/adviser-approval', function(req, res, next) {
     Thesis.listByAdviserId(req.user.id)
       .then(function(adviser_approval) {
         console.log('thesis data', adviser_approval);
-        res.render('faculty/adviser_approval', {
+        res.render('admin/adviser_approval', {
           layout: 'admin',
           adviser_approval: adviser_approval
         });
@@ -240,7 +240,7 @@ router.get('/thesis/committee-approval', function(req, res, next) {
     Thesis.listForCommitteeApproval(req.user.id)
       .then(function(committee_approval) {
         console.log('thesis data', committee_approval);
-        res.render('faculty/committee_approval', {
+        res.render('admin/committee_approval', {
           layout: 'admin',
           committee_approval: committee_approval
         });
