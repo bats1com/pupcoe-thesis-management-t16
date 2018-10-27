@@ -5,6 +5,7 @@ const Class = require('./../models/class');
 const Group = require('./../models/group');
 const Committee = require('./../models/committee');
 const Thesis = require('./../models/thesis');
+const Defense = require('./../models/defense');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -197,12 +198,11 @@ router.post('/thesis/committee-approval/approve', function(req, res, next) {
     console.log('id', req.body)
     Thesis.committeeApproved(req.body.thesisId, req.user.id)
       .then(function(committee_approval) {
-    // Create function to check if approval count reached more than 70%
         Thesis.checkCommitteeApprovalCount(req.body.thesisId)
           .then(function(memberCount) {
             console.log('memberCount', memberCount);
             var memCount = memberCount[0].member_approval;
-            if (memCount > 4) {                          // 5 members approval needed for committee approval
+            if (memCount > 4) {   // 5 members approval needed for committee approval
               Thesis.committeeApprovedComplete(req.body.thesisId)
             }
             console.log('committee approved:', committee_approval);
@@ -221,8 +221,21 @@ router.post('/thesis/committee-approval/reject', function(req, res, next) {
     Thesis.committeeReject(req.body.thesisId, req.user.id)
       .then(function(committee_approval) {
         console.log('committee approved:', committee_approval);
-        // Insert function that will check if committee count for approval is reached
         res.redirect('/faculty/thesis/committee-approval')
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/mor', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'faculty') {
+    Thesis.listMor()
+      .then(function (mor) {
+        res.render('faculty/mor', {
+          layout: 'faculty',
+          mor: mor
+        });
       });
   } else {
     res.redirect('/')

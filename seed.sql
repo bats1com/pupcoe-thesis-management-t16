@@ -102,3 +102,34 @@ CREATE TABLE "members_done" (
 -- ALTER TABLE thesis ADD COLUMN current_stage current_stage default 'none' NOT NULL;
 -- ALTER TABLE groups ADD COLUMN thesis_id INT REFERENCES thesis(id);
 
+CREATE TABLE "panel" (
+  "id" SERIAL PRIMARY KEY,
+  "defense_id" VARCHAR(5)
+);
+
+CREATE TABLE "panel_members" (
+  "id" SERIAL PRIMARY KEY,
+  "panel_id" INT REFERENCES panel(id),
+  "faculty_id" INT REFERENCES users(id),
+  "head_panel_id" INT REFERENCES users(id)
+);
+
+CREATE TABLE "defense_grades" (
+  "id" SERIAL PRIMARY KEY,
+  "grades" VARCHAR(50)
+);
+
+CREATE TABLE "defense" (
+"id" SERIAL PRIMARY KEY,
+"defense_type" current_stage default 'mor' NOT NULL,
+"thesis_id" INT REFERENCES thesis(id),
+"status_id" INT REFERENCES defense_grades(id),
+"panel_id" INT REFERENCES panel(id)
+);
+
+CREATE TABLE "comments" (
+  "id" SERIAL PRIMARY KEY,
+  "defense_id" INT REFERENCES defense(id),
+  "faculty_id" INT REFERENCES users(id), 
+  "comment" VARCHAR(1000)
+);

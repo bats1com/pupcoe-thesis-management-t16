@@ -16,7 +16,7 @@
       <th scope="col">Group #</th>
       <th scope="col">Adviser Approval</th>
       <th scope="col">Committee Approval</th>
-      <th scope="col"></th>
+      <th scope="col"></th> 
     </tr>
   </thead>
   <tbody>
@@ -31,7 +31,7 @@
       <td>
       {{#if this.committee_approved}}✓ 
 
-      {{#if alreadyChosen}} Already picked proposal for defense 
+      {{#if alreadyChosen}}
       {{else}} 
         <form action="/student/thesis/choose-proposal" method="POST">
           <button value="{{this.id}}" name="thesisId" type="submit">Choose Proposal</button>

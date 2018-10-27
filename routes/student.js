@@ -4,6 +4,7 @@ const User = require('./../models/user');
 const Class = require('./../models/class');
 const Group = require('./../models/group');
 const Thesis = require('./../models/thesis');
+const Defense = require('./../models/defense');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -41,7 +42,6 @@ router.get('/', function(req, res, next) {
 
 router.get('/thesis', function(req, res, next) {
   if (req.isAuthenticated() && req.user.user_type == 'student') {
-    var alreadyChosen = false;
     Class.getByStudentId(req.user.id)
       .then(function(data) {
         // create function for viewing all thesis
@@ -49,8 +49,10 @@ router.get('/thesis', function(req, res, next) {
           .then(function(thesis) {
             Group.checkThesisIdIfNull(data.group_id)
               .then(function (thesisId) {
-                console.log('thesisId', thesisId);
-                if (thesisId != null) {
+                console.log('thesisId', thesisId[0].thesis_id);
+                var alreadyChosen = false;
+                console.log('alreadyChosenb4', alreadyChosen);
+                if (thesisId[0].thesis_id != null) {
                   alreadyChosen = true;
                   console.log('alreadyChosen', alreadyChosen);
                 }
@@ -105,10 +107,30 @@ router.post('/thesis/choose-proposal', function(req, res, next) {
       .then(function(data) {
         Group.insertThesisId(req.body.thesisId, data.group_id)
           .then(function(data2) {
+            Defense.createMor(req.body.thesisId, data.group_id)
             console.log('insertedthesisId', data2);
-            res.redirect('/student/thesis');
+            res.redirect('/student/mor');
           });
       });
+  }
+});
+
+router.get('/mor', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'student') {
+    Class.getByStudentId(req.user.id)
+      .then(function(data) {
+        console.log('group_id', data.group_id);
+        Defense.listMorByGroupId(data.group_id)
+          .then(function(mor) {
+            console.log('mor DATA', mor);
+            res.render('student/mor', {
+              layout: 'student',
+              mor: mor
+            });
+          }); 
+      });
+  } else {
+    res.redirect('/')
   }
 });
 

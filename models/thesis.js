@@ -260,7 +260,32 @@ var Thesis = {
       });
     });
     return promise;
+  },
+
+  listMor: (thesisId) => {
+    const query = `
+      SELECT 
+        t.id,
+        t.title,
+        t.abstract,
+        t.group_id
+      FROM thesis t
+      WHERE t.current_stage = 'mor'
+    `;
+    var promise = new Promise((resolve, reject) => {
+      db.query(query, (req, data) => {
+        console.log('req', req)
+        console.log('data', data)
+        if (data && data.rowCount) {
+          resolve(data.rows);
+        } else {
+          resolve([]);
+        }
+      });
+    });
+    return promise;
   }
+
 };
 
 module.exports = Thesis;
