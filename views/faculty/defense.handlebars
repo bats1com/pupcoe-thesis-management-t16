@@ -25,10 +25,10 @@
         <td>{{this.year}}</td>
         <td>{{this.schedule}}</td>
         <td>
-        <a href="/admin/{{this.defense_type}}/details/{{this.id}}">Details</a>
+        <a href="/faculty/{{this.defense_type}}/details/{{this.id}}">Details</a>
         </td>
         <td>
-          <a href="/admin/{{this.defense_type}}/set-sched-and-panel/{{this.id}}">Set Schedule and Panel</a>
+          <a href="/faculty/{{this.defense_type}}/set-sched-and-panel/{{this.id}}">Set Schedule and Panel</a>
         </td>
       </tr>
       {{/each}}
@@ -61,7 +61,7 @@
       <td>{{this.group_id}}</td>
       <td>{{this.year}}</td>
       <td>{{this.schedule}}</td>
-      <td><a href="/admin/{{this.defense_type}}/grade/{{this.id}}">Add Grade and Comments</a></td>
+      <td><a href="/faculty/{{this.defense_type}}/grade/{{this.id}}">Add Grade and Comments</a></td>
     </tr>
     {{/each}}
   </tbody>
@@ -93,7 +93,7 @@
       <td>{{this.group_id}}</td>
       <td>{{this.year}}</td>
       <td>{{this.schedule}}</td>
-      <td><a href="/admin/{{this.defense_type}}/comments/{{this.id}}">Add Comments</a></td>
+      <td><a href="/faculty/{{this.defense_type}}/comments/{{this.id}}">Add Comments</a></td>
     </tr>
     {{/each}}
   </tbody>

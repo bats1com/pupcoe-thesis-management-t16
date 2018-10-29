@@ -102,6 +102,7 @@ CREATE TABLE "members_done" (
 -- ALTER TABLE thesis ADD COLUMN current_stage current_stage default 'none' NOT NULL;
 -- ALTER TABLE groups ADD COLUMN thesis_id INT REFERENCES thesis(id);
 -- ALTER TABLE defense_grades ADD COLUMN defense_id INT REFERENCES defense(id);
+ALTER TABLE defense ADD COLUMN schedule VARCHAR(250);
 
 CREATE TABLE "panel" (
   "id" SERIAL PRIMARY KEY,
@@ -126,7 +127,8 @@ CREATE TABLE "defense" (
 "defense_type" current_stage default 'mor' NOT NULL,
 "thesis_id" INT REFERENCES thesis(id),
 "status_id" INT REFERENCES defense_grades(id),
-"panel_id" INT REFERENCES panel(id)
+"panel_id" INT REFERENCES panel(id),
+"schedule" VARCHAR(250)
 );
 
 CREATE TABLE "comments" (

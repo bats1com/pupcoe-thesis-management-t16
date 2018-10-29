@@ -216,7 +216,17 @@ var Defense = {
   listMorDp1Dp2ByGroupId: (groupId, defense_type) => {
     const query = ` 
       SELECT 
-        *
+        d.thesis_id,
+        d.id,
+        t.title,
+        t.abstract,
+        t.group_id,
+        t.year,
+        d.schedule,
+        dg.grades,
+        u.first_name,
+        u.last_name,
+        c.comment
       FROM thesis t
       INNER JOIN defense d ON t.id = d.thesis_id
       INNER JOIN defense_grades dg ON d.id = dg.defense_id 
