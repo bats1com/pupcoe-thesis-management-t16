@@ -228,7 +228,7 @@ router.post('/thesis/committee-approval/reject', function(req, res, next) {
   }
 });
 
-router.get('/mor', function(req, res, next) {
+router.get('/mor', function(req, res, next) { //change
   if (req.isAuthenticated() && req.user.user_type == 'faculty') {
     Thesis.listMor()
       .then(function (mor) {

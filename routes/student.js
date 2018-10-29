@@ -120,12 +120,20 @@ router.get('/mor', function(req, res, next) {
     Class.getByStudentId(req.user.id)
       .then(function(data) {
         console.log('group_id', data.group_id);
-        Defense.listMorByGroupId(data.group_id)
-          .then(function(mor) {
-            console.log('mor DATA', mor);
-            res.render('student/mor', {
+        Defense.listMorDp1Dp2ByGroupId(data.group_id, 'mor')
+          .then(function(data) {
+            console.log('mor DATA', data);  
+            res.render('student/defense', {
               layout: 'student',
-              mor: mor
+              data: data,
+              thesis_id: data[0].thesis_id,
+              title: data[0].title,
+              abstract: data[0].abstract,
+              group_id: data[0].group_id,
+              year: data[0].year,
+              schedule: data[0].schedule,
+              grades: data[0].grades,
+              defense_type:'Methods of Research'
             });
           }); 
       });

@@ -101,6 +101,7 @@ CREATE TABLE "members_done" (
 -- CREATE TYPE current_stage AS ENUM ('none', 'mor', 'dp1', 'dp2');
 -- ALTER TABLE thesis ADD COLUMN current_stage current_stage default 'none' NOT NULL;
 -- ALTER TABLE groups ADD COLUMN thesis_id INT REFERENCES thesis(id);
+-- ALTER TABLE defense_grades ADD COLUMN defense_id INT REFERENCES defense(id);
 
 CREATE TABLE "panel" (
   "id" SERIAL PRIMARY KEY,
@@ -116,7 +117,8 @@ CREATE TABLE "panel_members" (
 
 CREATE TABLE "defense_grades" (
   "id" SERIAL PRIMARY KEY,
-  "grades" VARCHAR(50)
+  "grades" VARCHAR(50),
+  "defense_id" INT REFERENCES defense(id)
 );
 
 CREATE TABLE "defense" (

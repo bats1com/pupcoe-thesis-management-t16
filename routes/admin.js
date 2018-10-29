@@ -5,6 +5,7 @@ const Class = require('./../models/class');
 const Group = require('./../models/group');
 const Committee = require('./../models/committee');
 const Thesis = require('./../models/thesis');
+const Defense = require('./../models/defense');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -289,5 +290,526 @@ router.post('/thesis/committee-approval/reject', function(req, res, next) {
 });
 
 // Thesis proposal routes end
+
+// COPY FROM THIS PART for FACULTY VIEWS
+// MOR routes
+
+router.get('/mor', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    Defense.listMorDp1Dp2('mor') //change this maybe
+      .then(function (data) {
+        Defense.listMorDp1Dp2ByHeadPanel('mor', req.user.id)
+        .then(function (HeadPanel) {
+          Defense.listMorDp1Dp2ByFacultyId('mor', req.user.id)
+          .then(function (PanelMember) {
+            data.forEach(function(t) {
+              t.defense_type = 'mor';
+            });
+            HeadPanel.forEach(function(t) {
+              t.defense_type = 'mor';
+            });
+            PanelMember.forEach(function(t) {
+              t.defense_type = 'mor';
+            })
+            res.render('admin/defense', {
+              layout: 'admin',
+              data: data,
+              HeadPanel: HeadPanel,
+              PanelMember: PanelMember,
+              type: 'Methods of Research'
+            });
+          });
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/mor/set-sched-and-panel/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('mor', req.params.defenseId)
+      .then(function (data) {
+        console.log('listbyDefenseId', data)
+        User.list('faculty')
+        .then (function (faculties) {
+          res.render('admin/sched-panel', {
+            layout: 'admin',
+            data: data,
+            faculties: faculties,
+            defense_type: 'mor'
+          });
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/mor/set-sched-and-panel/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('sched and panel data', req.body.schedule, req.body.head_panel_id, req.body.faculty_id);
+    // add function to update sched and create panel data
+    Defense.createPanel(req.params.defenseId) // Can be improved by creating the panel at student choosing thesis for defense
+      .then (function (panelId) {
+        console.log('panelId', panelId)
+        Defense.updateSchedAndPanel(panelId, req.params.defenseId, req.body.schedule, req.body.head_panel_id, req.body.faculty_id)
+          .then (function (status) {
+            console.log('status', status);
+            res.redirect('/admin/mor');
+          })
+      });
+  } else {
+    res.redirect('/admin/mor')
+  }
+});
+
+router.get('/mor/details/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('mor', req.params.defenseId)
+      .then(function (data) {
+        console.log('listbyDefenseId', data)
+        Defense.listPanelMembers(req.params.defenseId)
+          .then (function (panel_members) {
+            console.log('panelmem', panel_members)
+            res.render('admin/defense_details', {
+              layout: 'admin',
+              data: data,
+              panel_members: panel_members
+            });
+          });
+      });
+  } else {  
+    res.redirect('/')
+  }
+});
+
+router.get('/mor/grade/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('mor', req.params.defenseId)
+      .then(function (data) {
+        res.render('admin/head_panel-grade', {
+          layout: 'admin',
+          data: data,
+          defense_type: 'mor'
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/mor/comments/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('mor', req.params.defenseId)
+      .then(function (data) {
+        console.log('listbyDefenseId', data)
+        res.render('admin/panel-comment', {
+          layout: 'admin',
+          data: data,
+          defense_type: 'mor'
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/mor/grade/:defenseId/add-grades', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    console.log('sched and panel data', req.body);
+    // add function for changing grade and promoting to dp1
+    Defense.addGrades(req.body.grades, req.params.defenseId)
+      .then(function(grades) {
+        Defense.addComments(req.params.defenseId, req.user.id, req.body.comment)
+        .then(function (comments) {
+          if (req.body.grades != 'Failed') {
+            Defense.getThesisIdByDefenseId('mor', req.params.defenseId)
+              .then(function (thesisId) {
+                console.log('id', thesisId)
+                Defense.createDp1Dp2Defense(thesisId, 'dp1')
+                  .then(function (created) {
+                    Defense.nextStage('dp1', req.params.defenseId)
+                      .then(function (nextstage) {
+                        res.redirect('/admin/mor');
+                      })
+                  });
+              })
+          } else {
+            console.log('sched  and panel data', req.body);
+            res.redirect('/admin/mor');
+          }
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/mor/comments/:defenseId/add-comments', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    console.log('sched and panel data', req.body);
+    // add function for changing grade and promoting to dp1
+    Defense.addComments(req.params.defenseId, req.user.id, req.body.comment)
+      .then(function (comments) {
+        console.log('sched and panel data', req.body);
+        res.redirect('/admin/mor');
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+// mor routes done
+
+//dp1 routes start here
+router.get('/dp1', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    Defense.listMorDp1Dp2('dp1') //change this maybe
+      .then(function (data) {
+        Defense.listMorDp1Dp2ByHeadPanel('dp1', req.user.id)
+        .then(function (HeadPanel) {
+          Defense.listMorDp1Dp2ByFacultyId('dp1', req.user.id)
+          .then(function (PanelMember) {
+            data.forEach(function(t) {
+              t.defense_type = 'dp1';
+            });
+            HeadPanel.forEach(function(t) {
+              t.defense_type = 'dp1';
+            });
+            PanelMember.forEach(function(t) {
+              t.defense_type = 'dp1';
+            })
+            res.render('admin/defense', {
+              layout: 'admin',
+              data: data,
+              HeadPanel: HeadPanel,
+              PanelMember: PanelMember,
+              type: 'Design Project 1'
+            });
+          });
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/dp1/set-sched-and-panel/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('dp1', req.params.defenseId)
+      .then(function (data) {
+        console.log('listbyDefenseId', data)
+        User.list('faculty')
+        .then (function (faculties) {
+          res.render('admin/sched-panel', {
+            layout: 'admin',
+            data: data,
+            faculties: faculties,
+            defense_type: 'dp1'
+          });
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/dp1/set-sched-and-panel/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('sched and panel data', req.body.schedule, req.body.head_panel_id, req.body.faculty_id);
+    // add function to update sched and create panel data
+    Defense.createPanel(req.params.defenseId) // Can be improved by creating the panel at student choosing thesis for defense
+      .then (function (panelId) {
+        console.log('panelId', panelId)
+        Defense.updateSchedAndPanel(panelId, req.params.defenseId, req.body.schedule, req.body.head_panel_id, req.body.faculty_id)
+          .then (function (status) {
+            console.log('status', status);
+            res.redirect('/admin/dp1');
+          })
+      });
+  } else {
+    res.redirect('/admin/dp1')
+  }
+});
+
+router.get('/dp1/details/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('dp1', req.params.defenseId)
+      .then(function (data) {
+        console.log('listbyDefenseId', data)
+        Defense.listPanelMembers(req.params.defenseId)
+          .then (function (panel_members) {
+            console.log('panelmem', panel_members)
+            res.render('admin/defense_details', {
+              layout: 'admin',
+              data: data,
+              panel_members: panel_members
+            });
+          });
+      });
+  } else {  
+    res.redirect('/')
+  }
+});
+
+router.get('/dp1/grade/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('dp1', req.params.defenseId)
+      .then(function (data) {
+        res.render('admin/head_panel-grade', {
+          layout: 'admin',
+          data: data,
+          defense_type: 'dp1'
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/dp1/comments/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('dp1', req.params.defenseId)
+      .then(function (data) {
+        console.log('listbyDefenseId', data)
+        res.render('admin/panel-comment', {
+          layout: 'admin',
+          data: data,
+          defense_type: 'dp1'
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/dp1/grade/:defenseId/add-grades', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    console.log('sched and panel data', req.body);
+    // add function for changing grade and promoting to dp1
+    Defense.addGrades(req.body.grades, req.params.defenseId)
+      .then(function(grades) {
+        Defense.addComments(req.params.defenseId, req.user.id, req.body.comment)
+        .then(function (comments) {
+          if (req.body.grades != 'Failed') {
+            Defense.getThesisIdByDefenseId('dp1', req.params.defenseId)
+              .then(function (thesisId) {
+                console.log('id', thesisId)
+                Defense.createDp1Dp2Defense(thesisId, 'dp2') //change 1 step higher
+                  .then(function (created) {
+                    Defense.nextStage('dp2', req.params.defenseId)
+                      .then(function (nextstage) {
+                        res.redirect('/admin/dp1');
+                      })
+                  });
+              })
+          } else {
+            console.log('sched  and panel data', req.body);
+            res.redirect('/admin/dp1');
+          }
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/dp1/comments/:defenseId/add-comments', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    console.log('sched and panel data', req.body);
+    // add function for changing grade and promoting to dp1
+    Defense.addComments(req.params.defenseId, req.user.id, req.body.comment)
+      .then(function (comments) {
+        console.log('sched and panel data', req.body);
+        res.redirect('/admin/dp1');
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+//dp1 ends here
+
+
+//dp2 routes start here
+router.get('/dp2', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    Defense.listMorDp1Dp2('dp2') //change this maybe
+      .then(function (data) {
+        Defense.listMorDp1Dp2ByHeadPanel('dp2', req.user.id)
+        .then(function (HeadPanel) {
+          Defense.listMorDp1Dp2ByFacultyId('dp2', req.user.id)
+          .then(function (PanelMember) {
+            data.forEach(function(t) {
+              t.defense_type = 'dp2';
+            });
+            HeadPanel.forEach(function(t) {
+              t.defense_type = 'dp2';
+            });
+            PanelMember.forEach(function(t) {
+              t.defense_type = 'dp2';
+            })
+            res.render('admin/defense', {
+              layout: 'admin',
+              data: data,
+              HeadPanel: HeadPanel,
+              PanelMember: PanelMember,
+              type: 'Design Project 2'
+            });
+          });
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/dp2/set-sched-and-panel/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('dp2', req.params.defenseId)
+      .then(function (data) {
+        console.log('listbyDefenseId', data)
+        User.list('faculty')
+        .then (function (faculties) {
+          res.render('admin/sched-panel', {
+            layout: 'admin',
+            data: data,
+            faculties: faculties,
+            defense_type: 'dp2'
+          });
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/dp2/set-sched-and-panel/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('sched and panel data', req.body.schedule, req.body.head_panel_id, req.body.faculty_id);
+    // add function to update sched and create panel data
+    Defense.createPanel(req.params.defenseId) // Can be improved by creating the panel at student choosing thesis for defense
+      .then (function (panelId) {
+        console.log('panelId', panelId)
+        Defense.updateSchedAndPanel(panelId, req.params.defenseId, req.body.schedule, req.body.head_panel_id, req.body.faculty_id)
+          .then (function (status) {
+            console.log('status', status);
+            res.redirect('/admin/dp2');
+          })
+      });
+  } else {
+    res.redirect('/admin/dp2')
+  }
+});
+
+router.get('/dp2/details/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('dp2', req.params.defenseId)
+      .then(function (data) {
+        console.log('listbyDefenseId', data)
+        Defense.listPanelMembers(req.params.defenseId)
+          .then (function (panel_members) {
+            console.log('panelmem', panel_members)
+            res.render('admin/defense_details', {
+              layout: 'admin',
+              data: data,
+              panel_members: panel_members
+            });
+          });
+      });
+  } else {  
+    res.redirect('/')
+  }
+});
+
+router.get('/dp2/grade/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('dp2', req.params.defenseId)
+      .then(function (data) {
+        res.render('admin/head_panel-grade', {
+          layout: 'admin',
+          data: data,
+          defense_type: 'dp2'
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/dp2/comments/:defenseId', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    Defense.listMorDp1Dp2ByDefenseId('dp2', req.params.defenseId)
+      .then(function (data) {
+        console.log('listbyDefenseId', data)
+        res.render('admin/panel-comment', {
+          layout: 'admin',
+          data: data,
+          defense_type: 'dp2'
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/dp2/grade/:defenseId/add-grades', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    console.log('sched and panel data', req.body);
+    // add function for changing grade and promoting to dp1
+    Defense.addGrades(req.body.grades, req.params.defenseId)
+      .then(function(grades) {
+        Defense.addComments(req.params.defenseId, req.user.id, req.body.comment)
+        .then(function (comments) {
+          if (req.body.grades != 'Failed') {
+            Defense.getThesisIdByDefenseId('dp2', req.params.defenseId)
+              .then(function (thesisId) {
+                res.redirect('/admin/dp2');
+              })
+          } else {
+            console.log('sched  and panel data', req.body);
+            res.redirect('/admin/dp2');
+          }
+        });
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.post('/dp2/comments/:defenseId/add-comments', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('defenseId', req.params.defenseId);
+    console.log('sched and panel data', req.body);
+    // add function for changing grade and promoting to dp1
+    Defense.addComments(req.params.defenseId, req.user.id, req.body.comment)
+      .then(function (comments) {
+        console.log('sched and panel data', req.body);
+        res.redirect('/admin/dp2');
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+//dp2 ends here
+// Add routes for grades and comments
 
 module.exports = router;

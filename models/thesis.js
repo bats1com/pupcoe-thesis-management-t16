@@ -262,7 +262,7 @@ var Thesis = {
     return promise;
   },
 
-  listMor: (thesisId) => {
+  listMor: () => {
     const query = `
       SELECT 
         t.id,
