@@ -217,6 +217,7 @@ var Defense = {
     const query = ` 
       SELECT 
         d.thesis_id,
+        d.id,
         t.title,
         t.abstract,
         t.group_id,
@@ -232,6 +233,31 @@ var Defense = {
       INNER JOIN comments c ON d.id = c.defense_id
       INNER JOIN users u ON c.faculty_id = u.id
       WHERE t.group_id = ${groupId}
+      AND d.defense_type = '${defense_type}'
+      ORDER BY t.id
+    `;
+    var promise = new Promise((resolve, reject) => {
+      console.log('query', query)
+      db.query(query, (req, data) => {
+        console.log('req', req)
+        if (data && data.rowCount) {
+          resolve(data.rows);
+        } else {
+          resolve([]);
+        }
+      });
+    });
+    return promise;
+  },
+
+  listCommentByDefenseId: (defenseId) => {
+    const query = ` 
+      SELECT 
+        *
+      FROM comments c
+      INNER JOIN users u ON c.faculty_id = u.id
+      WHERE c.defense_id = ${defenseId}
+      ORDER BY c.id
     `;
     var promise = new Promise((resolve, reject) => {
       console.log('query', query)
@@ -257,17 +283,16 @@ var Defense = {
       var createQuery2 = `
         INSERT INTO defense_grades(defense_id)
         VALUES ('${defenseId}')
-        RETURNING *
       `;
       db.query(createQuery, (req, data) => {
         // console.log('req', req);
-        console.log('created', data.rows[0].id);
+        console.log('created', data.rows[0]);
         resolve(data.rows[0].id);
       });
       db.query(createQuery2, (req2, data2) => {
         // console.log('req2', req2);
         console.log('created2', data2);
-        resolve(data2.rows[0]);
+        resolve(data2.rows);
       });
 
     });
@@ -279,18 +304,17 @@ var Defense = {
       var createQuery = `
         INSERT INTO comments(defense_id, faculty_id)
         VALUES (
-          '${headPanelId}',
-          '${defenseId}'
+          '${defenseId}',
+          '${headPanelId}'
         )
         RETURNING *;
       `;
       var createQuery2 = `
         INSERT INTO comments(defense_id, faculty_id)
         VALUES (
-          '${facultyId}',
-          '${defenseId}'
+          '${defenseId}',
+          '${facultyId}'
         )
-        RETURNING *;
       `;
       var createQuery3 = `
         INSERT INTO panel_members(panel_id, faculty_id, head_panel_id)
@@ -419,6 +443,37 @@ var Defense = {
       db.query(createQuery3, (req3, data3) => {
         console.log('created', data3);
         resolve(data3.rows[0]);
+      });
+    });
+    return promise;
+  },
+
+  finishThesis: (thesisId) => {
+    const promise = new Promise((resolve, reject) => {
+      var createQuery = `
+        UPDATE thesis
+        SET final_verdict = true
+        WHERE id = ${thesisId}
+        RETURNING *;
+      `;
+      db.query(createQuery, (req, data) => {
+        console.log('created', data);
+        resolve(data.rows[0]);
+      });
+    });
+    return promise;
+  },
+
+  listFinishedThesis: () => {
+    const promise = new Promise((resolve, reject) => {
+      var createQuery = `
+        SELECT * FROM thesis
+        WHERE final_verdict = true
+        ORDER BY id
+      `;
+      db.query(createQuery, (req, data) => {
+        console.log('created', data);
+        resolve(data.rows);
       });
     });
     return promise;

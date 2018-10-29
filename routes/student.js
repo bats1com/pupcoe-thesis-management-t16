@@ -122,21 +122,103 @@ router.get('/mor', function(req, res, next) {
         console.log('group_id', data.group_id);
         Defense.listMorDp1Dp2ByGroupId(data.group_id, 'mor')
           .then(function(data) {
-            console.log('mor DATA', data);  
-            res.render('student/defense', {
-              layout: 'student',
-              data: data,
-              thesis_id: data[0].thesis_id,
-              title: data[0].title,
-              abstract: data[0].abstract,
-              group_id: data[0].group_id,
-              year: data[0].year,
-              schedule: data[0].schedule,
-              grades: data[0].grades,
-              defense_type:'Methods of Research'
-            });
+            Defense.listCommentByDefenseId(data[0].id)
+              .then( function(comments) {
+                console.log('mor DATA', data);  
+                res.render('student/defense', {
+                  layout: 'student',
+                  data: data,
+                  comments: comments,
+                  thesis_id: data[0].thesis_id,
+                  title: data[0].title,
+                  abstract: data[0].abstract,
+                  group_id: data[0].group_id,
+                  year: data[0].year,
+                  schedule: data[0].schedule,
+                  grades: data[0].grades,
+                  defense_type:'Methods of Research'
+                });
+              })
           }); 
       });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/dp1', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'student') {
+    Class.getByStudentId(req.user.id)
+      .then(function(data) {
+        console.log('group_id', data.group_id);
+        Defense.listMorDp1Dp2ByGroupId(data.group_id, 'dp1')
+          .then(function(data) {
+            Defense.listCommentByDefenseId(data[0].id)
+              .then( function(comments) {
+                console.log('mor DATA', data);  
+                res.render('student/defense', {
+                  layout: 'student',
+                  data: data,
+                  comments: comments,
+                  thesis_id: data[0].thesis_id,
+                  title: data[0].title,
+                  abstract: data[0].abstract,
+                  group_id: data[0].group_id,
+                  year: data[0].year,
+                  schedule: data[0].schedule,
+                  grades: data[0].grades,
+                  defense_type:'Design Project 1'
+                });
+              })
+          }); 
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+
+router.get('/dp2', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'student') {
+    Class.getByStudentId(req.user.id)
+      .then(function(data) {
+        console.log('group_id', data.group_id);
+        Defense.listMorDp1Dp2ByGroupId(data.group_id, 'dp2')
+          .then(function(data) {
+            Defense.listCommentByDefenseId(data[0].id)
+              .then( function(comments) {
+                console.log('mor DATA', data);  
+                res.render('student/defense', {
+                  layout: 'student',
+                  data: data,
+                  comments: comments,
+                  thesis_id: data[0].thesis_id,
+                  title: data[0].title,
+                  abstract: data[0].abstract,
+                  group_id: data[0].group_id,
+                  year: data[0].year,
+                  schedule: data[0].schedule,
+                  grades: data[0].grades,
+                  defense_type:'Design Project 2'
+                });
+              })
+          }); 
+      });
+  } else {
+    res.redirect('/')
+  }
+});
+
+router.get('/finished', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'student') {
+    Defense.listFinishedThesis('done')
+      .then(function(list) {
+        console.log('list', list);
+        res.render('student/finished', {
+          layout: 'student',
+          list: list
+        });
+      })
   } else {
     res.redirect('/')
   }

@@ -117,7 +117,7 @@ CREATE TABLE "panel_members" (
 
 CREATE TABLE "defense_grades" (
   "id" SERIAL PRIMARY KEY,
-  "grades" VARCHAR(50),
+  "grades" VARCHAR(50)
   "defense_id" INT REFERENCES defense(id)
 );
 

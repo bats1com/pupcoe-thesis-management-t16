@@ -781,7 +781,10 @@ router.post('/dp2/grade/:defenseId/add-grades', function(req, res, next) {
           if (req.body.grades != 'Failed') {
             Defense.getThesisIdByDefenseId('dp2', req.params.defenseId)
               .then(function (thesisId) {
-                res.redirect('/admin/dp2');
+                Defense.finishThesis (thesisId)
+                  .then(function (yes) {
+                  res.redirect('/admin/dp2');
+                  });
               })
           } else {
             console.log('sched  and panel data', req.body);
@@ -809,7 +812,21 @@ router.post('/dp2/comments/:defenseId/add-comments', function(req, res, next) {
   }
 });
 
+router.get('/finished', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    Defense.listFinishedThesis('done')
+      .then(function(list) {
+        console.log('list', list);
+        res.render('admin/finished', {
+          layout: 'admin',
+          list: list
+        });
+      })
+  } else {
+    res.redirect('/')
+  }
+});
+
 //dp2 ends here
-// Add routes for grades and comments
 
 module.exports = router;
