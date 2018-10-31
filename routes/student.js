@@ -124,20 +124,30 @@ router.get('/mor', function(req, res, next) {
           .then(function(data) {
             Defense.listCommentByDefenseId(data.group_id, 'mor')
               .then( function(comments) {
-                console.log('mor DATA', data);  
-                res.render('student/defense', {
-                  layout: 'student',
-                  data: data,
-                  comments: comments,
-                  thesis_id: data[0].thesis_id,
-                  title: data[0].title,
-                  abstract: data[0].abstract,
-                  group_id: data[0].group_id,
-                  year: data[0].year,
-                  schedule: data[0].schedule,
-                  grades: data[0].grades,
-                  defense_type:'Methods of Research'
-                });
+                console.log('mor DATA', data);
+                console.log('hasProperty:', data.hasOwnProperty('thesis_id'));
+                if (data[0] != undefined) {
+                  res.render('student/defense', {
+                    layout: 'student',
+                    data: data,
+                    comments: comments,
+                    thesis_id: data[0].thesis_id,
+                    title: data[0].title,
+                    abstract: data[0].abstract,
+                    group_id: data[0].group_id,
+                    year: data[0].year,
+                    schedule: data[0].schedule,
+                    grades: data[0].grades,
+                    defense_type:'Methods of Research'
+                  });
+                } else {
+                  res.render('student/defense', {
+                    layout: 'student',
+                    data: data,
+                    comments: comments,
+                    defense_type:'Methods of Research'
+                  });
+                }
               })
           }); 
       });
@@ -156,19 +166,29 @@ router.get('/dp1', function(req, res, next) {
             Defense.listCommentByDefenseId(data.group_id, 'dp1')
               .then( function(comments) {
                 console.log('mor DATA', data);  
-                res.render('student/defense', {
-                  layout: 'student',
-                  data: data,
-                  comments: comments,
-                  thesis_id: data[0].thesis_id,
-                  title: data[0].title,
-                  abstract: data[0].abstract,
-                  group_id: data[0].group_id,
-                  year: data[0].year,
-                  schedule: data[0].schedule,
-                  grades: data[0].grades,
-                  defense_type:'Design Project 1'
-                });
+                console.log('hasProperty:', data.hasOwnProperty('thesis_id'));
+                if (data[0] != undefined) {
+                  res.render('student/defense', {
+                    layout: 'student',
+                    data: data,
+                    comments: comments,
+                    thesis_id: data[0].thesis_id,
+                    title: data[0].title,
+                    abstract: data[0].abstract,
+                    group_id: data[0].group_id,
+                    year: data[0].year,
+                    schedule: data[0].schedule,
+                    grades: data[0].grades,
+                    defense_type:'Design Project 1'
+                  });
+                } else {
+                  res.render('student/defense', {
+                    layout: 'student',
+                    data: data,
+                    comments: comments,
+                    defense_type:'Design Project 1'
+                  });
+                }
               })
           }); 
       });
@@ -188,20 +208,31 @@ router.get('/dp2', function(req, res, next) {
             console.log('listByGroupId', data);
             Defense.listCommentByDefenseId(data.group_id, 'dp2')
               .then( function(comments) {
-                console.log('mor DATA', data);  
-                res.render('student/defense', {
-                  layout: 'student',
-                  data: data,
-                  comments: comments,
-                  thesis_id: data[0].thesis_id,
-                  title: data[0].title,
-                  abstract: data[0].abstract,
-                  group_id: data[0].group_id,
-                  year: data[0].year,
-                  schedule: data[0].schedule,
-                  grades: data[0].grades,
-                  defense_type:'Design Project 2'
-                });
+                console.log('mor DATA', data); 
+                console.log('hasProperty:', data.hasOwnProperty('thesis_id'));
+                if (data[0] != undefined) {
+                  res.render('student/defense', {
+                    layout: 'student',
+                    data: data,
+                    comments: comments,
+                    thesis_id: data[0].thesis_id,
+                    title: data[0].title,
+                    abstract: data[0].abstract,
+                    group_id: data[0].group_id,
+                    year: data[0].year,
+                    schedule: data[0].schedule,
+                    grades: data[0].grades,
+                    defense_type:'Design Project 2'
+                  });
+                } else {
+                  res.render('student/defense', {
+                    layout: 'student',
+                    data: data,
+                    comments: comments,
+                    defense_type:'Design Project 2'
+                  });
+                }
+
               })
           }); 
       });
