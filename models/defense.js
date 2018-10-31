@@ -251,13 +251,20 @@ var Defense = {
     return promise;
   },
 
-  listCommentByDefenseId: (defenseId) => {
+  listCommentByDefenseId: (groupId, defense_type) => {
     const query = ` 
       SELECT 
         *
       FROM comments c
       INNER JOIN users u ON c.faculty_id = u.id
-      WHERE c.defense_id = ${defenseId}
+      WHERE c.defense_id = (
+        SELECT d.id
+        FROM defense d
+        INNER JOIN thesis t ON 
+        d.thesis_id = t.id
+        WHERE t.group_id = ${groupId}
+        AND d.defense_type = '${defense_type}'
+      )
       ORDER BY c.id
     `;
     var promise = new Promise((resolve, reject) => {
