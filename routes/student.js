@@ -186,7 +186,6 @@ router.get('/dp2', function(req, res, next) {
         Defense.listMorDp1Dp2ByGroupId(data.group_id, 'dp2')
           .then(function(data) {
             console.log('listByGroupId', data);
-            console.log('data[0].id', data[0].id);
             Defense.listCommentByDefenseId(data.group_id, 'dp2')
               .then( function(comments) {
                 console.log('mor DATA', data);  
