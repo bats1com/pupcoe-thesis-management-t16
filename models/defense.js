@@ -226,9 +226,10 @@ var Defense = {
         dg.grades,
         u.first_name,
         u.last_name,
-        c.comment
-      FROM thesis t
-      INNER JOIN defense d ON t.id = d.thesis_id
+        c.comment,
+        d.defense_type
+      FROM defense d
+      INNER JOIN thesis t ON d.thesis_id = t.id
       INNER JOIN defense_grades dg ON d.id = dg.defense_id 
       INNER JOIN comments c ON d.id = c.defense_id
       INNER JOIN users u ON c.faculty_id = u.id
