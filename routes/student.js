@@ -256,4 +256,20 @@ router.get('/finished', function(req, res, next) {
   }
 });
 
+router.post('/search', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'student') {
+    console.log('keyword', req.body)
+    Defense.listFinishedThesisByKeyword(req.body.keyword)
+      .then(function(list) {
+        console.log('list', list);
+        res.render('student/finished', {
+          layout: 'student',
+          list: list
+        });
+      })
+  } else {
+    res.redirect('/')
+  }
+});
+
 module.exports = router;

@@ -765,5 +765,21 @@ router.get('/finished', function(req, res, next) {
 
 //dp2 ends here
 
+router.post('/search', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.user_type == 'faculty') {
+    console.log('keyword', req.body)
+    Defense.listFinishedThesisByKeyword(req.body.keyword)
+      .then(function(list) {
+        console.log('list', list);
+        res.render('student/finished', {
+          layout: 'faculty',
+          list: list
+        });
+      })
+  } else {
+    res.redirect('/')
+  }
+});
+
 
 module.exports = router;

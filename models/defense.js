@@ -485,6 +485,25 @@ var Defense = {
       });
     });
     return promise;
+  },
+
+  listFinishedThesisByKeyword: (keyword) => {
+    const promise = new Promise((resolve, reject) => {
+      var createQuery = `
+        SELECT 
+          *
+        FROM thesis t
+        WHERE t.final_verdict = true
+        AND t.title ILIKE '%${keyword}%'
+        OR t.abstract ILIKE '%${keyword}%'
+        ORDER BY id
+      `;
+      db.query(createQuery, (req, data) => {
+        console.log('created', data);
+        resolve(data.rows);
+      });
+    });
+    return promise;
   }
 
 };

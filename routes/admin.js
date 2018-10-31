@@ -812,6 +812,8 @@ router.post('/dp2/comments/:defenseId/add-comments', function(req, res, next) {
   }
 });
 
+//dp2 ends here
+
 router.get('/finished', function(req, res, next) {
   if (req.isAuthenticated() && req.user.is_admin) {
     Defense.listFinishedThesis('done')
@@ -827,6 +829,21 @@ router.get('/finished', function(req, res, next) {
   }
 });
 
-//dp2 ends here
+router.post('/search', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    console.log('keyword', req.body)
+    Defense.listFinishedThesisByKeyword(req.body.keyword)
+      .then(function(list) {
+        console.log('list', list);
+        res.render('student/finished', {
+          layout: 'admin',
+          list: list
+        });
+      })
+  } else {
+    res.redirect('/')
+  }
+});
+
 
 module.exports = router;
