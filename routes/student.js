@@ -122,7 +122,7 @@ router.get('/mor', function(req, res, next) {
         console.log('group_id', data.group_id);
         Defense.listMorDp1Dp2ByGroupId(data.group_id, 'mor')
           .then(function(data) {
-            Defense.listCommentByDefenseId(data[0].id)
+            Defense.listCommentByDefenseId(data[0].defense_id)
               .then( function(comments) {
                 console.log('mor DATA', data);  
                 res.render('student/defense', {
@@ -153,7 +153,7 @@ router.get('/dp1', function(req, res, next) {
         console.log('group_id', data.group_id);
         Defense.listMorDp1Dp2ByGroupId(data.group_id, 'dp1')
           .then(function(data) {
-            Defense.listCommentByDefenseId(data[0].id)
+            Defense.listCommentByDefenseId(data[0].defense_id)
               .then( function(comments) {
                 console.log('mor DATA', data);  
                 res.render('student/defense', {
@@ -185,7 +185,7 @@ router.get('/dp2', function(req, res, next) {
         console.log('group_id', data.group_id);
         Defense.listMorDp1Dp2ByGroupId(data.group_id, 'dp2')
           .then(function(data) {
-            Defense.listCommentByDefenseId(data[0].id)
+            Defense.listCommentByDefenseId(data[0].defense_id)
               .then( function(comments) {
                 console.log('mor DATA', data);  
                 res.render('student/defense', {
